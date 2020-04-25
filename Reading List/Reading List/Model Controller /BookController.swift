@@ -14,14 +14,14 @@ class BookController: Codable {
     // CRUD
 
 
-    // #3 Create a filename string for the plist, such as "ReadingList.plist" -- Not understading this task?
+    // Step 3. Persistence Functions
     private var readingListURL: URL? {
         let fileManager = FileManager.default
         guard let documentDirectory = fileManager.urls(for: .documentDirectory, in: .userDomainMask) .first else { return nil }
         return documentDirectory.appendingPathComponent("books.plist") // Am I suppose to use ReadingList.plist or books?
     }
 
-// Inside of a do-try-catch block create a constant called booksData. Using the encode(value: ...) function of the property list encoder, encode the books array into Data.
+    // Step 4. Save
     private func saveToPersistentStore() {
         guard let booksURL = readingListURL else { return }
         
@@ -34,6 +34,22 @@ class BookController: Codable {
             NSLog("Error saving Books List data: \(error)")
         }
     }
+    
+    // Step 5. Load
+    private func loadFromPersistentStore() {
+        let booksFileManager = FileManager.default
+        guard let booksURL = readingListURL,
+            booksFileManager.fileExists(atPath: booksURL.path) else { return }
+        
+        do {
+            let booksData = try Data(contentsOf: booksURL)
+            let decodedBooks = PropertyListDecoder()
+            books = try decodedBooks.decode([Book].self, from: booksData)
+        } catch {
+            NSLog("Error saving Books List data: \(error)")
+        }
+    }
+    
     
     
 }
